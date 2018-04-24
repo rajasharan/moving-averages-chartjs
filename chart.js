@@ -1,11 +1,11 @@
 var ctx = document.getElementById("my-chart");
 
 axios.get('https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=INX&outputsize=full&apikey=6XXXJS1ZXIORAEEXXXRPJ4')
-	.then(res => res.data)
-	.then(json => json['Time Series (Daily)'])
-	.then(R.pluck('4. close'))
-	.then(keysAndValues)
-	.catch(console.log);
+    .then(res => res.data)
+    .then(json => json['Time Series (Daily)'])
+    .then(R.pluck('4. close'))
+    .then(keysAndValues)
+    .catch(console.log);
 
 function keysAndValues(obj) {
     var keys = R.compose(R.reverse, R.keys)(obj);
@@ -19,22 +19,22 @@ function keysAndValues(obj) {
 }
 
 function nDayAverage(n, keys, values) {
-	var movingAvg = [];
-	while (values.length > n) {
-		avg = R.pipe(R.take(n), R.sum)(values)/n;
-		values = values.slice(1);
-		movingAvg.push(avg.toFixed(4));
-	}
+    var movingAvg = [];
+    while (values.length > n) {
+        avg = R.pipe(R.take(n), R.sum)(values)/n;
+        values = values.slice(1);
+        movingAvg.push(avg.toFixed(4));
+    }
 
-	keys = keys.slice(n);
+    keys = keys.slice(n);
 
-	var mappedIndex = R.addIndex(R.map);
-	return mappedIndex((val, i) => {
-		return {
-			x: keys[i],
-			y: val
-		}
-	})(movingAvg);
+    var mappedIndex = R.addIndex(R.map);
+    return mappedIndex((val, i) => {
+        return {
+            x: keys[i],
+            y: val
+        }
+    })(movingAvg);
 }
 
 function createChart(keys, values, movingAvg20, movingAvg100, movingAvg200, movingAvg500, movingAvg1000) {
