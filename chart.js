@@ -1,12 +1,23 @@
 var canvas = document.getElementById("my-chart");
 var modal = document.getElementById("modal");
 
-axios.get('https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=INX&outputsize=full&apikey=6XXXJS1ZXIORAEEXXXRPJ4')
-    .then(R.prop('data'))
-    .then(R.prop('Time Series (Daily)'))
-    .then(R.pluck('4. close'))
-    .then(keysAndValues)
-    .catch(console.log);
+fireRequest('https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=INX&outputsize=full&apikey=6XXXJS1ZXIORAEEXXXRPJ4', 4000);
+
+function fireRequest(url, timeout) {
+    axios.get(url, {timeout})
+        .then(R.prop('data'))
+        .then(R.prop('Time Series (Daily)'))
+        .then(R.pluck('4. close'))
+        .then(keysAndValues)
+        .catch(e => {
+            console.log(e);
+            throw e;
+        })
+        .catch(e => {
+            console.log('fallback: ', e);
+            fireRequest('./results.json', 0);
+        });
+}
 
 function keysAndValues(obj) {
     var keys = R.compose(R.reverse, R.keys)(obj);
